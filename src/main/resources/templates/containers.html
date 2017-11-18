@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, shrink-to-fit=no"/>
+    <title>Title</title>
+
+    <link rel="stylesheet" href="../css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="../css/glyphicons.css"/>
+    <link rel="stylesheet" href="../css/tether.min.css"/>
+    <link rel="stylesheet" href="../css/main.css"/>
+    <link rel="stylesheet" href="../css/toastr.min.css"/>
+    <script src="../js/jquery-3.2.1.js"></script>
+    <script src="../js/tether.min.js"></script>
+    <script src="../js/popper.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/vue/vue.js"></script>
+    <script src="../js/vue/vue-resource-1.3.4.js"></script>
+    <script src="../js/toastr.min.js"></script>
+    <script src="../js/bootbox.min.js"></script>
+
+    <style>
+        html {
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="fragments/header :: nav"></div>
+
+<div class="container" id="docker-moon-containers">
+
+    <!-- container actions -->
+    <div class="row" style="padding-top: 10px;">
+        <div class="card text-center">
+            <div class="card-header">
+                <span class="glyphicon glyphicon-list"></span> Container
+            </div>
+            <div class="card-body">
+                <table class="table table-hover table-striped table-bordered table-responsive table-sm">
+                    <thead>
+                        <tr>
+                            <td>
+                                <div class="form-check">
+                                    <label class="form-check-label" />
+                                    <input class="form-check-input" type="checkbox" v-on:click="selectAllContainers()"/>
+                                </div>
+                            </td>
+                            <td>Id</td>
+                            <td>Command</td>
+                            <td>Image</td>
+                            <td>Ports</td>
+                            <td>Created</td>
+                            <td>Status</td>
+                            <td>State</td>
+                            <td>#</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="container in containers">
+                            <td>
+                                <div class="form-check">
+                                    <label class="form-check-label" />
+                                    <input class="form-check-input" type="checkbox" v-on:click="containerSelect(container.Id)"/>
+                                </div>
+                            </td>
+                            <td>{{ container.Id.substr(0,13) }}</td>
+                            <td>{{ container.Command }}</td>
+                            <td>{{ container.Image }}</td>
+                            <td>{{ getContainerPorts(container) }}</td>
+                            <td>{{ new Date(container.Created).toLocaleString()}}</td>
+                            <td>{{ container.Status }}</td>
+                            <td>
+                                <span class="badge" v-bind:class="getContainerState(container.State)">{{ container.State }}</span>
+                            </td>
+                            <td>
+                                <span v-if="isKillableContainer(container)">
+                                    <button class="btn btn-danger btn-sm" v-on:click="killContainer(container)">Kill</button>
+                                </span>
+                                <span v-else="">
+                                    <button class="btn btn-danger btn-sm" v-on:click="killContainer(container)" th:disabled="disabled">Kill</button>
+                                </span>
+                                <span v-if="isRestartableContainer(container)">
+                                    <button class="btn btn-info btn-sm" v-on:click="restartContainer(container)">Restart</button>
+                                </span>
+                                <span v-else="">
+                                    <button class="btn btn-info btn-sm" v-on:click="restartContainer(container)" th:disabled="disabled">Restart</button>
+                                </span>
+                                <span v-if="isPausableContainer(container)">
+                                    <button class="btn btn-warning btn-sm" v-on:click="pauseContainer(container)">Pause</button>
+                                </span>
+                                <span v-else="">
+                                    <button class="btn btn-warning btn-sm" v-on:click="pauseContainer(container)" th:disabled="disabled">Pause</button>
+                                </span>
+                                <span v-if="isStopableContainer(container)">
+                                    <button class="btn btn-dark btn-sm" v-on:click="stopContainer(container)">Stop</button>
+                                </span>
+                                <span v-else="">
+                                    <button class="btn btn-dark btn-sm" v-on:click="stopContainer(container)" th:disabled="disabled">Stop</button>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="../js/app/container.js"></script>
+</body>
+</html>
