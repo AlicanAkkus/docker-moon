@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, shrink-to-fit=no"/>
+    <title>Containers</title>
+
+    <link rel="stylesheet" href="../css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="../css/glyphicons.css"/>
+    <link rel="stylesheet" href="../css/tether.min.css"/>
+    <link rel="stylesheet" href="../css/main.css"/>
+    <link rel="stylesheet" href="../css/toastr.min.css"/>
+    <script src="../js/jquery-3.2.1.js"></script>
+    <script src="../js/tether.min.js"></script>
+    <script src="../js/popper.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/vue/vue.js"></script>
+    <script src="../js/vue/vue-resource-1.3.4.js"></script>
+    <script src="../js/toastr.min.js"></script>
+    <script src="../js/bootbox.min.js"></script>
+
+    <style>
+        html {
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="fragments/header :: nav"></div>
+
+<div class="container" id="docker-moon-containers">
+
+    <!-- container actions -->
+    <div class="row" style="padding-top: 10px;">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-sm-7">
+                        <div class="btn-group text-right">
+                            <button value="button" class="btn btn-primary btn-sm" v-on:click="doActionsForContainers('started','start')">
+                                <i class="glyphicon glyphicon-play" aria-hidden="true"></i> Play
+                            </button>
+                            <button value="button" class="btn btn-dark btn-sm" v-on:click="doActionsForContainers('stopped','stop')">
+                                <i class="glyphicon glyphicon-stop" aria-hidden="true"></i> Stop
+                            </button>
+                            <button value="button" class="btn btn-danger btn-sm" v-on:click="doActionsForContainers('killed','kill')">
+                                <i class="glyphicon glyphicon-ban-circle" aria-hidden="true"></i> Kill
+                            </button>
+                            <button value="button" class="btn btn-info btn-sm" v-on:click="doActionsForContainers('restarted','restart')">
+                                <i class="glyphicon glyphicon-refresh" aria-hidden="true"></i> Restart
+                            </button>
+                            <button value="button" class="btn btn-warning btn-sm" v-on:click="doActionsForContainers('paused','pause')">
+                                <i class="glyphicon glyphicon-pause" aria-hidden="true"></i> Pause
+                            </button>
+                            <button value="button" class="btn btn-info btn-sm" v-on:click="doActionsForContainers('resumed','resume')">
+                                <i class="glyphicon glyphicon-play" aria-hidden="true"></i> Resume
+                            </button>
+                            <button value="button" class="btn btn-danger btn-sm" v-on:click="doActionsForContainers('removed','remove')">
+                                <i class="glyphicon glyphicon-trash" aria-hidden="true"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="input-group">
+                            <span class="input-group-addon glyphicon glyphicon-search"></span>
+                            <input value="text" class="form-control" placeholder="Search Containers" v-model="search"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover table-striped table-bordered table-responsive table-sm">
+                    <thead>
+                        <tr>
+                            <td>
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input class="container form-check-input" type="checkbox" v-model="isSelectedAllContainers"/>
+                                    </label>
+                                </div>
+                            </td>
+                            <td>Id</td>
+                            <td>Name</td>
+                            <td>Command</td>
+                            <td>Image</td>
+                            <td>Ports</td>
+                            <td>Created</td>
+                            <td>State</td>
+                            <td>Actions</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="container in filteredContainers">
+                            <td>
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input class="container form-check-input" type="checkbox" v-bind:value="container.Id" v-model="selectedContainers"/>
+                                    </label>
+                                </div>
+                            </td>
+                            <td>{{ container.Id.substr(0,8) }}</td>
+                            <td>{{ container.Names[0] }}</td>
+                            <td>{{ container.Command }}</td>
+                            <td>{{ container.Image }}</td>
+                            <td>{{ getContainerPorts(container) }}</td>
+                            <td>{{ new Date(container.Created).toLocaleString()}}</td>
+                            <td>
+                                <span class="badge" v-bind:class="getContainerState(container.State)">{{ container.State }}</span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-success btn-sm" v-on:click="logContainer(container)">Logs</button>
+                                    <button v-if="isPausableContainer(container)" class="btn btn-warning btn-sm" v-on:click="pauseContainer(container)">
+                                        <i class="glyphicon glyphicon-pause" aria-hidden="true"></i> Pause
+                                    </button>
+                                    <button v-else="isPausableContainer(container)" class="btn btn-warning btn-sm" v-on:click="pauseContainer(container)" th:disabled="disabled">
+                                        <i class="glyphicon glyphicon-pause" aria-hidden="true"></i> Pause
+                                    </button>
+                                    <button v-if="isStopableContainer(container)" class="btn btn-dark btn-sm" v-on:click="stopContainer(container)">
+                                        <i class="glyphicon glyphicon-stop" aria-hidden="true"></i> Stop
+                                    </button>
+                                    <button v-else="isStopableContainer(container)" class="btn btn-dark btn-sm" v-on:click="stopContainer(container)" th:disabled="disabled">
+                                        <i class="glyphicon glyphicon-stop" aria-hidden="true"></i> Stop
+                                    </button>
+                                    <button v-if="isRestartableContainer(container)" class="btn btn-info btn-sm" v-on:click="restartContainer(container)">
+                                        <i class="glyphicon glyphicon-refresh" aria-hidden="true"></i> Restart
+                                    </button>
+                                    <button v-else="isRestartableContainer(container)" class="btn btn-info btn-sm" v-on:click="restartContainer(container)" th:disabled="disabled">
+                                        <i class="glyphicon glyphicon-refresh" aria-hidden="true"></i> Restart
+                                    </button>
+                                    <button v-if="isKillableContainer(container)" class="btn btn-danger btn-sm" v-on:click="killContainer(container)">
+                                        <i class="glyphicon glyphicon-ban-circle" aria-hidden="true"></i> Kill
+                                    </button>
+                                    <button v-else="isKillableContainer(container)" class="btn btn-danger btn-sm" v-on:click="killContainer(container)" th:disabled="disabled">
+                                        <i class="glyphicon glyphicon-ban-circle" aria-hidden="true"></i> Kill
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- container logs modal -->
+    <div class="modal fade" id="container-log-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Container Logs</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="windows">
+                        <p class="terminal">
+                            <p class="command">
+                                <b>{{ containerLogs.command }}</b>
+                            </p>
+                            <p class="log" v-for="log in containerLogs.logs">
+                                {{ log }}
+                            </p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script src="../js/app/container.js"></script>
+</body>
+</html>
