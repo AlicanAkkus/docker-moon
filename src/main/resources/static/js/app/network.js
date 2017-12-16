@@ -1,6 +1,6 @@
-const imagesUrl = "/images/";
+const networksUrl = "/networks/";
 
-$("#image-nav").addClass("active");
+$("#network-nav").addClass("active");
 
 toastr.options = {
     "progressBar": true
@@ -10,27 +10,34 @@ String.prototype.capitalize = function () {
     return this.charAt(0).toUpperCase() + this.slice(1);
 }
 
-var imagesVue = new Vue({
-    el: "#docker-moon-images",
+var networksVue = new Vue({
+    el: "#docker-moon-networks",
     data: {
-        images: [],
+        networks: [],
         search: '',
-        selectedImages: [],
-        isSelectedAllImages: false
+        selectedNetworks: [],
+        isSelectedAllNetworks: false
+    },
+    computed: {
+        filteredNetworks(){
+            return this.networks.filter((network) => {
+                return network.Name.toLowerCase().includes(this.search.toLowerCase());
+        });
+        }
     },
     methods: {
-        getImages: function () {
-            this.$http.get(imagesUrl)
+        getNetworks: function () {
+            this.$http.get(networksUrl)
                 .then(function (response) {
-                    this.images = response.data;
+                    this.networks = response.data;
                 }, function (error) {
                     console.log(error.statusText);
                 });
         },
-        removeImage: function (image) {
+        removeNetwork: function (network) {
             var parent = this;
             bootbox.confirm({
-                message: "Image will be removed. Are you sure?",
+                message: "Network will be removed. Are you sure?",
                 buttons: {
                     confirm: {
                         label: 'Yes, I\'m sure!',
@@ -43,9 +50,9 @@ var imagesVue = new Vue({
                 },
                 callback: function (result) {
                     if (result) {
-                        parent.$http.delete(imagesUrl + image.Id).then(function (response) {
-                            toastr.success("Image removed successfuly.");
-                            parent.getImages();
+                        parent.$http.delete(networksUrl + network.Id).then(function (response) {
+                            toastr.success("Network removed successfuly.");
+                            parent.getNetworks();
                         }, function (error) {
                             toastr.warning("An error occured.");
                         });
@@ -55,6 +62,6 @@ var imagesVue = new Vue({
         }
     },
     created: function () {
-        this.getImages();
+        this.getNetworks();
     }
 });

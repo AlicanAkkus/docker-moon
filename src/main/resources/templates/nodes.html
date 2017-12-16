@@ -3,7 +3,7 @@
       xmlns:v-bind="http://www.w3.org/1999/xhtml">
 <head>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, shrink-to-fit=no"/>
-    <title>Images</title>
+    <title>Nodes</title>
 
     <link rel="stylesheet" href="../css/bootstrap.min.css"/>
     <link rel="stylesheet" href="../css/glyphicons.css"/>
@@ -29,7 +29,7 @@
 
 <div th:replace="fragments/header :: nav"></div>
 
-<div class="container" id="docker-moon-images">
+<div class="container" id="docker-moon-nodes">
 
     <!-- container actions -->
     <div class="row" style="padding-top: 10px;">
@@ -39,54 +39,59 @@
                     <div class="col-sm-5">
                         <div class="input-group">
                             <span class="input-group-addon glyphicon glyphicon-search"></span>
-                            <input value="text" class="form-control" placeholder="Search Images" v-model="search"/>
+                            <input value="text" class="form-control" placeholder="Search Nodes" v-model="search"/>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="card-body">
-                <table class="table table-hover table-striped table-bordered table-responsive table-sm">
+                    <table class="table table-hover table-striped table-bordered table-responsive table-sm">
                     <thead>
                         <tr>
                             <td>
                                 <div class="form-check">
                                     <label class="form-check-label">
-                                        <input class="container form-check-input" type="checkbox" v-model="isSelectedAllImages"/>
+                                        <input class="container form-check-input" type="checkbox" v-model="isSelectedAllNodes"/>
                                     </label>
                                 </div>
                             </td>
-                            <td>Image Id</td>
-                            <td>Hostname</td>
-                            <td>Author</td>
-                            <td>Created</td>
-                            <td>Parent</td>
-                            <td>Cmd</td>
-                            <td>Entrypoint</td>
-                            <td>ExposedPorts</td>
-                            <td>Size</td>
+                            <td>Id</td>
+                            <td>Created At</td>
+                            <td>Updated At</td>
+                            <td>Role</td>
+                            <td>Availability</td>
+                            <td>Manager Status</td>
                             <td>Action</td>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="image in images">
+                        <tr v-for="node in filteredNodes">
                             <td>
                                 <div class="form-check">
                                     <label class="form-check-label">
-                                        <input class="container form-check-input" type="checkbox" v-bind:value="image.Id" v-model="selectedImages"/>
+                                        <input class="container form-check-input" type="checkbox" v-bind:value="node.ID" v-model="selectedNodes"/>
                                     </label>
                                 </div>
                             </td>
-                            <td>{{ image.Id.substr(7, 8) }}</td>
-                            <td>{{ image.Config.Hostname }}</td>
-                            <td>{{ image.Author }}</td>
-                            <td>{{ new Date(image.Created).toLocaleString()}}</td>
-                            <td>{{ image.Parent.substr(7, 8) }}</td>
-                            <td>{{ image.Config.Cmd }}</td>
-                            <td>{{ image.Config.Entrypoint }}</td>
-                            <td>{{ image.Config.ExposedPorts }}</td>
-                            <td>{{ (image.Size * Math.pow(10, -6)).toFixed(2) }} MB</td>
+                            <td>{{ node.ID }}</td>
+                            <td>{{ new Date(node.CreatedAt).toLocaleString() }}</td>
+                            <td>{{ new Date(node.UpdatedAt).toLocaleString() }}</td>
+                            <td><span class="badge badge-success">{{ node.Spec.Role }}</span></td>
+                            <td><span class="badge" v-bind:class="node.Spec.Availability == 'active' ? 'badge-success' : 'badge-warning' ">{{ node.Spec.Availability }}</span></td>
                             <td>
-                                <button class="btn btn-danger btn-sm" v-on:click="removeImage(image)">
+                                <ul class="text-left">
+                                    <li><b>Addr :</b> {{ node.ManagerStatus.Addr }}</li>
+                                    <li><b>Leader :</b> {{ node.ManagerStatus.Leader }}</li>
+                                    <li><b>Reachability :</b> {{ node.ManagerStatus.Reachability }}</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <button v-if="node.Spec.Role != 'manager'" class="btn btn-danger btn-sm" v-on:click="deleteNode(node)">
+                                    <i class="glyphicon glyphicon-ban-circle" aria-hidden="true"></i> Remove
+                                </button>
+                                <button v-if="node.Spec.Role == 'manager'" class="btn btn-danger btn-sm"
+                                        v-on:click="deleteNode(node)" th:disabled="disabled"
+                                        data-toggle="tooltip" data-placement="top" title="Cannot Remove Manager Node">
                                     <i class="glyphicon glyphicon-ban-circle" aria-hidden="true"></i> Remove
                                 </button>
                             </td>
@@ -98,6 +103,6 @@
     </div>
 </div>
 
-<script src="../js/app/image.js"></script>
+<script src="../js/app/node.js"></script>
 </body>
 </html>

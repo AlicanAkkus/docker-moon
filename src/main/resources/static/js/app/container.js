@@ -1,9 +1,13 @@
-Vue.config.devtools = true;
-
 const containersUrl = "/containers/";
+
+$("#container-nav").addClass("active");
 
 toastr.options = {
     "progressBar": true
+}
+
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
 }
 
 var containersVue = new Vue({
@@ -11,10 +15,22 @@ var containersVue = new Vue({
     data: {
         containers: [],
         selectedContainers: [],
-        inspectedContainer: null
+        isSelectedAllContainers: false,
+        search: '',
+        containerLogs: {
+            command: '',
+            logs : []
+        }
+    },
+    computed: {
+        filteredContainers(){
+            return this.containers.filter((container) => {
+                return container.Names[0].toLowerCase().includes(this.search.toLowerCase());
+            });
+        }
     },
     methods: {
-        getContainers: function () {
+        getImages: function () {
             this.$http.get(containersUrl)
                 .then(function (response) {
                     this.containers = response.data;
@@ -32,32 +48,45 @@ var containersVue = new Vue({
                     return 'badge-danger';
             }
         },
-        getContainerPorts: function (container) {
-            var ports = [];
-            if (container.Ports != null && container.Ports.length > 0) {
-                for (port in container.Ports) {
-                    ports.push(container.Ports[port].Type + ' ' + container.Ports[port].PrivatePort + ':' + container.Ports[port].PublicPort);
-                }
-            }
-
-            return ports.toString();
-        },
         containerSelect: function (containerId) {
             var indexOfContainer = this.selectedContainers.indexOf(containerId);
 
             if (indexOfContainer === -1) {
                 this.selectedContainers.push(containerId);
             } else {
-                this.selectedContainers.splice(containerId);
+                this.selectedContainers.splice(indexOfContainer, 1);
             }
         },
-        selectAllContainers: function () {
-            if (this.selectedContainers.length > 0) {
-                this.selectedContainers = [];
-            }
-            this.containers.forEach(function (container) {
-                this.selectedContainers.push(container.Id);
-            }, this);
+        doActionsForContainers: function (type, action) {
+            var parent = this;
+            var message = "Container(s) will be " + type + ". Are you sure?";
+            bootbox.confirm({
+                message: message,
+                buttons: {
+                    confirm: {
+                        label: 'Yes, I\'m sure!',
+                        className: 'btn-success'
+                    },
+                    cancel: {
+                        label: 'Not yet :(',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        parent.$http
+                            .post(containersUrl + action, parent.selectedContainers)
+                            .then(function (response) {
+                                console.log(response);
+                                toastr.success(type.capitalize() + " finished successfuly.");
+                                parent.getImages();
+                            }, function (error) {
+                                console.log(error);
+                                toastr.warning("An error occured.");
+                            });
+                    }
+                }
+            });
         },
         inspectContainer: function (container) {
             this.$http.get(containersUrl + container.Id).then(function (response) {
@@ -82,14 +111,9 @@ var containersVue = new Vue({
                 },
                 callback: function (result) {
                     if (result) {
-                        var dialog = bootbox.dialog({
-                            message: '<p><i class="fa fa-spin fa-spinner"></i>Please wait...</p>',
-                            closeButton: false
-                        });
                         parent.$http.get(containersUrl + 'restart/' + container.Id).then(function (response) {
                             toastr.success("Restarted container successfuly.");
-                            dialog.modal("hide");
-                            container.State = 'running';
+                            parent.getImages();
                         }, function (error) {
                             toastr.warning("An error occured.");
                         });
@@ -113,14 +137,9 @@ var containersVue = new Vue({
                 },
                 callback: function (result) {
                     if (result) {
-                        var dialog = bootbox.dialog({
-                            message: '<p><i class="fa fa-spin fa-spinner"></i>Please wait...</p>',
-                            closeButton: false
-                        });
                         parent.$http.get(containersUrl + 'stop/' + container.Id).then(function (response) {
                             toastr.success("Stopped container successfuly");
-                            dialog.modal("hide");
-                            container.State = 'exited';
+                            parent.getImages();
                         }, function (error) {
                             toastr.warning("An error occured.");
                         });
@@ -144,19 +163,22 @@ var containersVue = new Vue({
                 },
                 callback: function (result) {
                     if (result) {
-                        var dialog = bootbox.dialog({
-                            message: '<p><i class="fa fa-spin fa-spinner"></i>Please wait...</p>',
-                            closeButton: false
-                        });
                         parent.$http.get(containersUrl + 'kill/' + container.Id).then(function (response) {
-                            dialog.modal('hide');
                             toastr.success("Killed container successfuly");
-                            container.State = 'exited';
+                            parent.getImages();
                         }, function (error) {
                             toastr.warning("An error occured.");
                         });
                     }
                 }
+            });
+        },
+        logContainer: function (container) {
+            this.$http.get(containersUrl + 'log/' + container.Id).then(function (response) {
+                this.containerLogs.command = "docker container logs " + container.Id.substr(0,8);
+                this.containerLogs.logs = response.data.data.split("\n");
+                $('#container-log-modal').modal('show');
+            }, function (error) {
             });
         },
         isStopableContainer: function (container) {
@@ -192,9 +214,27 @@ var containersVue = new Vue({
         isKillableContainer: function (container) {
             if(container.State !== 'exited')
                 return true;
+        },
+        isStatsViewable: function (container) {
+            if(container.State !== 'exited')
+                return true;
         }
     },
     created: function () {
-        this.getContainers();
+        this.getImages();
+    },
+    watch: {
+        'isSelectedAllContainers': function (newVal, oldVal) {
+            if(newVal){
+                // select all container
+                containersVue.selectedContainers = [];
+                containersVue.containers.forEach(function (container) {
+                    this.selectedContainers.push(container.Id);
+                }, containersVue);
+            }else{
+                // deselect all container
+                containersVue.selectedContainers = [];
+            }
+        }
     }
 });

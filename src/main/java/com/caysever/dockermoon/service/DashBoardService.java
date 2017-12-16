@@ -112,7 +112,7 @@ public class DashBoardService {
         infoVo.setName(info.name());
         infoVo.setImages(info.images());
         infoVo.setContainers(info.containers());
-        infoVo.setMemory(info.memTotal() * Math.pow(10, -9));
+        infoVo.setMemory(info.memTotal());
         infoVo.setDockerRootDir(info.dockerRootDir());
         infoVo.setStorageDriver(info.storageDriver());
         infoVo.setKernelVersion(info.kernelVersion());

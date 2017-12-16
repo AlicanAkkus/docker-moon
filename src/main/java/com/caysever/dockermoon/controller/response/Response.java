@@ -3,6 +3,7 @@ package com.caysever.dockermoon.controller.response;
 public class Response {
 
     private String status;
+    private String data;
     private String errorCode;
     private String errorMessage;
 
@@ -12,6 +13,14 @@ public class Response {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 
     public String getErrorCode() {

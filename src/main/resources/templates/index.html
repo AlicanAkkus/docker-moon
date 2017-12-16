@@ -61,7 +61,7 @@
                             </tr>
                             <tr>
                                 <td class="text-left">Memory</td>
-                                <td class="text-right">{{dashboard.infoVo.memory}} GB</td>
+                                <td class="text-right">{{ (dashboard.infoVo.memory * Math.pow(10, -9)).toFixed(2) }} GB</td>
                             </tr>
                         </tbody>
                     </table>

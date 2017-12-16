@@ -1,6 +1,6 @@
-const imagesUrl = "/images/";
+const volumesUrl = "/volumes/";
 
-$("#image-nav").addClass("active");
+$("#volume-nav").addClass("active");
 
 toastr.options = {
     "progressBar": true
@@ -10,27 +10,34 @@ String.prototype.capitalize = function () {
     return this.charAt(0).toUpperCase() + this.slice(1);
 }
 
-var imagesVue = new Vue({
-    el: "#docker-moon-images",
+var volumesVue = new Vue({
+    el: "#docker-moon-volumes",
     data: {
-        images: [],
+        volumes: [],
         search: '',
-        selectedImages: [],
-        isSelectedAllImages: false
+        selectedVolumes: [],
+        isSelectedAllVolumes: false
+    },
+    computed: {
+        filteredVolumes(){
+            return this.volumes.filter((volume) => {
+                return volume.Name.toLowerCase().includes(this.search.toLowerCase());
+        });
+        }
     },
     methods: {
-        getImages: function () {
-            this.$http.get(imagesUrl)
+        getVolumes: function () {
+            this.$http.get(volumesUrl)
                 .then(function (response) {
-                    this.images = response.data;
+                    this.volumes = response.data;
                 }, function (error) {
                     console.log(error.statusText);
                 });
         },
-        removeImage: function (image) {
+        removeVolume: function (volume) {
             var parent = this;
             bootbox.confirm({
-                message: "Image will be removed. Are you sure?",
+                message: "Volume will be removed. Are you sure?",
                 buttons: {
                     confirm: {
                         label: 'Yes, I\'m sure!',
@@ -43,9 +50,9 @@ var imagesVue = new Vue({
                 },
                 callback: function (result) {
                     if (result) {
-                        parent.$http.delete(imagesUrl + image.Id).then(function (response) {
-                            toastr.success("Image removed successfuly.");
-                            parent.getImages();
+                        parent.$http.delete(volumesUrl + volume.Name).then(function (response) {
+                            toastr.success("Volume removed successfuly.");
+                            parent.getVolumes();
                         }, function (error) {
                             toastr.warning("An error occured.");
                         });
@@ -55,6 +62,6 @@ var imagesVue = new Vue({
         }
     },
     created: function () {
-        this.getImages();
+        this.getVolumes();
     }
 });

@@ -1,4 +1,4 @@
-package com.iyzipay.card.management.api.infrastructure.interceptor;
+package com.caysever.dockermoon.interceptor;
 
 import org.slf4j.MDC;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;

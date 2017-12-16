@@ -3,10 +3,8 @@ package com.caysever.dockermoon.service;
 import com.caysever.dockermoon.controller.response.Response;
 import com.caysever.dockermoon.enumtype.ResponseStatusType;
 import com.caysever.dockermoon.exception.ContainerException;
-import com.caysever.dockermoon.handler.ExceptionHandler;
 import com.spotify.docker.client.DockerClient;
-import com.spotify.docker.client.messages.Image;
-import com.spotify.docker.client.messages.ImageInfo;
+import com.spotify.docker.client.messages.Volume;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,31 +16,28 @@ import java.util.stream.Collectors;
 import static com.caysever.dockermoon.handler.ExceptionHandler.handle;
 
 @Component
-public class ImageService {
+public class VolumeService {
 
-    private final Logger logger = LoggerFactory.getLogger(ImageService.class);
-    private final String ERROR_TEMPLATE = "An error occured while getting image info. {}";
+    private final Logger logger = LoggerFactory.getLogger(VolumeService.class);
+    private final String ERROR_TEMPLATE = "An error occured while getting volume info. {}";
 
     @Autowired
     private DockerClient dockerClient;
 
-    @Autowired
-    private ExceptionHandler exceptionHandler;
-
-    public List<ImageInfo> listOfAllImages() {
+    public List<Volume> listOfAllVolumes() {
         try {
-            return dockerClient.listImages().stream().map(this::inspect).collect(Collectors.toList());
+            return dockerClient.listVolumes().volumes().stream().map(this::inspect).collect(Collectors.toList());
         } catch (Exception e) {
             logger.error(ERROR_TEMPLATE, e);
             throw new ContainerException(e);
         }
     }
 
-    public Response removeImage(String imageId) {
+    public Response removeVolume(String volumeName) {
         Response response = new Response();
 
         handle(() -> {
-            dockerClient.removeImage(imageId);
+            dockerClient.removeVolume(volumeName);
 
             response.setStatus(ResponseStatusType.SUCCESS.getValue());
             return response;
@@ -51,9 +46,9 @@ public class ImageService {
         return response;
     }
 
-    private ImageInfo inspect(Image image) {
+    private Volume inspect(Volume volume) {
         try {
-            return dockerClient.inspectImage(image.id());
+            return dockerClient.inspectVolume(volume.name());
         } catch (Exception e) {
             logger.error(ERROR_TEMPLATE, e);
             throw new ContainerException(e);

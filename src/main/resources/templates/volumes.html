@@ -3,7 +3,7 @@
       xmlns:v-bind="http://www.w3.org/1999/xhtml">
 <head>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, shrink-to-fit=no"/>
-    <title>Images</title>
+    <title>Volumes</title>
 
     <link rel="stylesheet" href="../css/bootstrap.min.css"/>
     <link rel="stylesheet" href="../css/glyphicons.css"/>
@@ -29,7 +29,7 @@
 
 <div th:replace="fragments/header :: nav"></div>
 
-<div class="container" id="docker-moon-images">
+<div class="container" id="docker-moon-volumes">
 
     <!-- container actions -->
     <div class="row" style="padding-top: 10px;">
@@ -39,7 +39,7 @@
                     <div class="col-sm-5">
                         <div class="input-group">
                             <span class="input-group-addon glyphicon glyphicon-search"></span>
-                            <input value="text" class="form-control" placeholder="Search Images" v-model="search"/>
+                            <input value="text" class="form-control" placeholder="Search Volumes" v-model="search"/>
                         </div>
                     </div>
                 </div>
@@ -51,42 +51,40 @@
                             <td>
                                 <div class="form-check">
                                     <label class="form-check-label">
-                                        <input class="container form-check-input" type="checkbox" v-model="isSelectedAllImages"/>
+                                        <input class="container form-check-input" type="checkbox" v-model="isSelectedAllVolumes"/>
                                     </label>
                                 </div>
                             </td>
-                            <td>Image Id</td>
-                            <td>Hostname</td>
-                            <td>Author</td>
-                            <td>Created</td>
-                            <td>Parent</td>
-                            <td>Cmd</td>
-                            <td>Entrypoint</td>
-                            <td>ExposedPorts</td>
-                            <td>Size</td>
+                            <td>Name</td>
+                            <td>Driver</td>
+                            <td>DriverOpts</td>
+                            <td>Labels(KEY / VALUE)</td>
+                            <td>Mountpoint</td>
+                            <td>Scope</td>
                             <td>Action</td>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="image in images">
+                        <tr v-for="volume in filteredVolumes">
                             <td>
                                 <div class="form-check">
                                     <label class="form-check-label">
-                                        <input class="container form-check-input" type="checkbox" v-bind:value="image.Id" v-model="selectedImages"/>
+                                        <input class="container form-check-input" type="checkbox" v-bind:value="volume.Name" v-model="selectedVolumes"/>
                                     </label>
                                 </div>
                             </td>
-                            <td>{{ image.Id.substr(7, 8) }}</td>
-                            <td>{{ image.Config.Hostname }}</td>
-                            <td>{{ image.Author }}</td>
-                            <td>{{ new Date(image.Created).toLocaleString()}}</td>
-                            <td>{{ image.Parent.substr(7, 8) }}</td>
-                            <td>{{ image.Config.Cmd }}</td>
-                            <td>{{ image.Config.Entrypoint }}</td>
-                            <td>{{ image.Config.ExposedPorts }}</td>
-                            <td>{{ (image.Size * Math.pow(10, -6)).toFixed(2) }} MB</td>
+                            <td>{{ volume.Name.substr(0, 25) }}</td>
+                            <td><span class="badge badge-success">{{ volume.Driver }}</span></td>
+                            <td>{{ volume.DriverOpts }}</td>
                             <td>
-                                <button class="btn btn-danger btn-sm" v-on:click="removeImage(image)">
+                                <ul v-for="(value, key) in volume.Labels">
+                                    <li>{{ key }} / {{ value }}</li>
+                                </ul>
+                            </td>
+                            <td>{{ volume.Mountpoint.substr(0, 50) }}</td>
+                            <td><span class="badge badge-info">{{ volume.Scope }}</span></td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" v-on:click="removeVolume(volume)">
                                     <i class="glyphicon glyphicon-ban-circle" aria-hidden="true"></i> Remove
                                 </button>
                             </td>
@@ -98,6 +96,6 @@
     </div>
 </div>
 
-<script src="../js/app/image.js"></script>
+<script src="../js/app/volume.js"></script>
 </body>
 </html>

@@ -4,13 +4,13 @@ public enum ResponseStatusType {
 
     SUCCESS("success"), FAILURE("failiure");
 
-    private String type;
+    private String value;
 
-    ResponseStatusType(String type) {
-        this.type = type;
+    ResponseStatusType(String value) {
+        this.value = value;
     }
 
-    public String getType() {
-        return type;
+    public String getValue() {
+        return value;
     }
 }

@@ -1,8 +1,8 @@
 package com.caysever.dockermoon.controller;
 
 import com.caysever.dockermoon.controller.response.Response;
-import com.caysever.dockermoon.manager.ImageManager;
-import com.spotify.docker.client.messages.ImageInfo;
+import com.caysever.dockermoon.manager.NodeManager;
+import com.spotify.docker.client.messages.swarm.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,28 +12,28 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/images")
-public class ImageController {
+@RequestMapping("/nodes")
+public class NodeController {
 
     @Autowired
-    private ImageManager imageManager;
+    private NodeManager nodeManager;
 
     @GetMapping
     public String page() {
-        return "images";
+        return "nodes";
     }
 
     @ResponseBody
     @GetMapping("/")
-    public ResponseEntity<List<ImageInfo>> listOfAllImages() {
-        List<ImageInfo> images = imageManager.listOfAllImages();
-        return ResponseEntity.status(HttpStatus.OK).body(images);
+    public ResponseEntity<List<Node>> listOfAllNodes() {
+        List<Node> nodes = nodeManager.listOfAllNodes();
+        return ResponseEntity.status(HttpStatus.OK).body(nodes);
     }
 
     @ResponseBody
-    @DeleteMapping("/{imageId}")
-    public ResponseEntity<Response> deleteImage(@PathVariable String imageId) {
-        Response response = imageManager.removeImage(imageId);
+    @DeleteMapping("/{nodeId}")
+    public ResponseEntity<Response> deleteNode(@PathVariable String nodeId) {
+        Response response = nodeManager.deleteNode(nodeId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

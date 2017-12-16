@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, shrink-to-fit=no"/>
+    <title>Swarm</title>
+
+    <link rel="stylesheet" href="../css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="../css/glyphicons.css"/>
+    <link rel="stylesheet" href="../css/tether.min.css"/>
+    <link rel="stylesheet" href="../css/main.css"/>
+    <link rel="stylesheet" href="../css/toastr.min.css"/>
+    <script src="../js/jquery-3.2.1.js"></script>
+    <script src="../js/tether.min.js"></script>
+    <script src="../js/popper.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/vue/vue.js"></script>
+    <script src="../js/vue/vue-resource-1.3.4.js"></script>
+    <script src="../js/toastr.min.js"></script>
+    <script src="../js/bootbox.min.js"></script>
+
+    <style>
+        html {
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="fragments/header :: nav"></div>
+
+<div class="container" id="docker-moon-swarm">
+
+    <div class="row" style="padding-top: 10px;">
+
+        <!-- swarm info div -->
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-header">
+                    Swarm Info
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            ID
+                            <span class="badge badge-success"><b>{{ swarm.ID }}</b></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Created At
+                            <span class="badge badge-success"><b>{{ new Date(swarm.CreatedAt).toLocaleString() }}</b></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Updated At
+                            <span class="badge badge-success"><b>{{ new Date(swarm.UpdatedAt).toLocaleString() }}</b></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Version Index
+                            <span class="badge badge-success"><b>{{ swarm.Version.Index }}</b></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- swarm orchestration & raft div -->
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-header">
+                    Orchestration / Raft
+                </div>
+                <div class="card-body">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Election Tick
+                        <span class="badge badge-success badge-pill"><b>{{ swarm.Spec.Raft.ElectionTick }}</b></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Heartbeat Tick
+                        <span class="badge badge-success badge-pill"><b>{{ swarm.Spec.Raft.HeartbeatTick }}</b></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Log Entries For Slow Followers
+                        <span class="badge badge-success badge-pill"><b>{{ swarm.Spec.Raft.LogEntriesForSlowFollowers }}</b></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Snapshot Interval
+                        <span class="badge badge-success badge-pill"><b>{{ swarm.Spec.Raft.SnapshotInterval }}</b></span>
+                    </li>
+                </div>
+            </div>
+        </div>
+
+        <!-- swarm other infos -->
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-header">
+                    Spec
+                </div>
+                <div class="card-body">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Node Cert Expiry
+                        <span class="badge badge-success badge-pill"><b>{{ new Date(swarm.Spec.CAConfig.NodeCertExpiry).toLocaleString() }}</b></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Heartbeat Period
+                        <span class="badge badge-success badge-pill"><b>{{ swarm.Spec.Dispatcher.HeartbeatPeriod }}</b></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Auto Lock Managers
+                        <span class="badge badge-success badge-pill"><b>{{ swarm.Spec.EncryptionConfig.AutoLockManagers }}</b></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Log Driver
+                        <span class="badge badge-success badge-pill"><b>{{ swarm.Spec.TaskDefaults.LogDriver }}</b></span>
+                    </li>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="padding-top: 10px;">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    Join Tokens
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">
+                            Manager
+                            <span>{{ swarm.JoinTokens.Manager }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-info">
+                            Worker
+                            <span>{{ swarm.JoinTokens.Worker }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../js/app/swarm.js"></script>
+</body>
+</html>

@@ -1,32 +1,37 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, shrink-to-fit=no"/>
     <title>Title</title>
+    <style>
+        html {
+            font-size: 12px;
+        }
+    </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark" th:fragment="nav">
     <ul class="navbar-nav">
-        <li class="nav-item active">
+        <li id="dashboard-nav" class="nav-item">
             <a class="nav-link" href="/index"><span class="glyphicon glyphicon-dashboard"></span> Dashboard</a>
         </li>
-        <li class="nav-item">
+        <li id="container-nav" class="nav-item">
             <a class="nav-link" href="/containers"><span class="glyphicon glyphicon-list"></span> Containers</a>
         </li>
-        <li class="nav-item">
+        <li id="image-nav" class="nav-item">
             <a class="nav-link" href="/images"><span class="glyphicon glyphicon-duplicate"></span> Images</a>
         </li>
-        <li class="nav-item">
+        <li id="network-nav" class="nav-item">
             <a class="nav-link" href="/networks"><span class="glyphicon glyphicon-cd"></span> Networks</a>
         </li>
-        <li class="nav-item">
+        <li id="volume-nav" class="nav-item">
             <a class="nav-link" href="/volumes"><span class="glyphicon glyphicon-tags"></span> Volumes</a>
         </li>
-        <li class="nav-item">
+        <li id="swarm-nav" class="nav-item">
             <a class="nav-link" href="/swarm"><span class="glyphicon glyphicon-equalizer"></span> Swarm</a>
         </li>
-        <li class="nav-item">
+        <li id="node-nav" class="nav-item">
             <a class="nav-link" href="/nodes"><span class="glyphicon glyphicon-oil"></span> Nodes</a>
         </li>
         <li class="nav-item">

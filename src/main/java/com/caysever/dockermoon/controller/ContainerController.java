@@ -8,11 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -42,10 +40,10 @@ public class ContainerController {
     }
 
     @ResponseBody
-    @GetMapping("/restart")
-    public ResponseEntity<ContainerInfo> restartContainers(@PathVariable("containerId") String containerId) {
-        ContainerInfo containerInfo = containerManager.getContainerInfo(containerId);
-        return ResponseEntity.status(HttpStatus.OK).body(containerInfo);
+    @PostMapping("/restart")
+    public ResponseEntity<Response> restartContainers(@RequestBody ArrayList<String> containers) {
+        Response response = containerManager.restartContainers(containers);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @ResponseBody
@@ -56,10 +54,10 @@ public class ContainerController {
     }
 
     @ResponseBody
-    @GetMapping("/pause")
-    public ResponseEntity<ContainerInfo> pauseContainers(@PathVariable("containerId") String containerId) {
-        ContainerInfo containerInfo = containerManager.getContainerInfo(containerId);
-        return ResponseEntity.status(HttpStatus.OK).body(containerInfo);
+    @PostMapping("/pause")
+    public ResponseEntity<Response> pauseContainers(@RequestBody ArrayList<String> containers) {
+        Response response = containerManager.pauseContainers(containers);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @ResponseBody
@@ -70,10 +68,10 @@ public class ContainerController {
     }
 
     @ResponseBody
-    @GetMapping("/unpause")
-    public ResponseEntity<ContainerInfo> unpauseContainers(@PathVariable("containerId") String containerId) {
-        ContainerInfo containerInfo = containerManager.getContainerInfo(containerId);
-        return ResponseEntity.status(HttpStatus.OK).body(containerInfo);
+    @PostMapping("/unpause")
+    public ResponseEntity<Response> unpauseContainers(@RequestBody ArrayList<String> containers) {
+        Response response = containerManager.unpauseContainers(containers);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @ResponseBody
@@ -84,10 +82,10 @@ public class ContainerController {
     }
 
     @ResponseBody
-    @GetMapping("/stop")
-    public ResponseEntity<ContainerInfo> stopContainers(@PathVariable("containerId") String containerId) {
-        ContainerInfo containerInfo = containerManager.getContainerInfo(containerId);
-        return ResponseEntity.status(HttpStatus.OK).body(containerInfo);
+    @PostMapping("/stop")
+    public ResponseEntity<Response> stopContainers(@RequestBody ArrayList<String> containers) {
+        Response response = containerManager.stopContainers(containers);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @ResponseBody
@@ -98,10 +96,10 @@ public class ContainerController {
     }
 
     @ResponseBody
-    @GetMapping("/start")
-    public ResponseEntity<ContainerInfo> startContainers(@PathVariable("containerId") String containerId) {
-        ContainerInfo containerInfo = containerManager.getContainerInfo(containerId);
-        return ResponseEntity.status(HttpStatus.OK).body(containerInfo);
+    @PostMapping("/start")
+    public ResponseEntity<Response> startContainers(@RequestBody ArrayList<String> containers) {
+        Response response = containerManager.startContainers(containers);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @ResponseBody
@@ -112,16 +110,37 @@ public class ContainerController {
     }
 
     @ResponseBody
-    @GetMapping("/kişş")
-    public ResponseEntity<ContainerInfo> killContainers(@PathVariable("containerId") String containerId) {
-        ContainerInfo containerInfo = containerManager.getContainerInfo(containerId);
-        return ResponseEntity.status(HttpStatus.OK).body(containerInfo);
+    @PostMapping("/kill")
+    public ResponseEntity<Response> killContainers(@RequestBody ArrayList<String> containers) {
+        Response response = containerManager.killContainers(containers);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @ResponseBody
     @GetMapping("/kill/{containerId}")
     public ResponseEntity<Response> killContainer(@PathVariable("containerId") String containerId) {
         Response response = containerManager.killContainer(containerId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @ResponseBody
+    @GetMapping("/log/{containerId}")
+    public ResponseEntity<Response> logContainer(@PathVariable("containerId") String containerId) {
+        Response response = containerManager.logContainer(containerId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @ResponseBody
+    @PostMapping("/remove")
+    public ResponseEntity<Response> removeContainers(@RequestBody ArrayList<String> containers) {
+        Response response = containerManager.removeContainers(containers);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @ResponseBody
+    @GetMapping("/remove/{containerId}")
+    public ResponseEntity<Response> removeContainer(@PathVariable("containerId") String containerId) {
+        Response response = containerManager.removeContainer(containerId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

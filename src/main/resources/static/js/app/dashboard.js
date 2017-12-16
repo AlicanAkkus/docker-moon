@@ -1,5 +1,7 @@
 const dashBoardUrl = "/dashboard/stats";
 
+$("#dashboard-nav").addClass("active");
+
 var dashboardVue = new Vue({
    el: "#docker-moon-dashboard",
     data: {

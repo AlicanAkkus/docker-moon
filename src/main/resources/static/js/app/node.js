@@ -1,6 +1,11 @@
-const imagesUrl = "/images/";
+const nodesUrl = "/nodes/";
 
-$("#image-nav").addClass("active");
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+});
+
+$("#node-nav").addClass("active");
+
 
 toastr.options = {
     "progressBar": true
@@ -10,27 +15,34 @@ String.prototype.capitalize = function () {
     return this.charAt(0).toUpperCase() + this.slice(1);
 }
 
-var imagesVue = new Vue({
-    el: "#docker-moon-images",
+var nodesVue = new Vue({
+    el: "#docker-moon-nodes",
     data: {
-        images: [],
+        nodes: [],
         search: '',
-        selectedImages: [],
-        isSelectedAllImages: false
+        selectedNodes: [],
+        isSelectedAllNodes: false
+    },
+    computed: {
+        filteredNodes(){
+            return this.nodes.filter((node) => {
+                return node.ID.toLowerCase().includes(this.search.toLowerCase());
+        });
+        }
     },
     methods: {
-        getImages: function () {
-            this.$http.get(imagesUrl)
+        getNodes: function () {
+            this.$http.get(nodesUrl)
                 .then(function (response) {
-                    this.images = response.data;
+                    this.nodes = response.data;
                 }, function (error) {
                     console.log(error.statusText);
                 });
         },
-        removeImage: function (image) {
+        deleteNode: function (node) {
             var parent = this;
             bootbox.confirm({
-                message: "Image will be removed. Are you sure?",
+                message: "Node will be removed(forced). Are you sure?",
                 buttons: {
                     confirm: {
                         label: 'Yes, I\'m sure!',
@@ -43,9 +55,9 @@ var imagesVue = new Vue({
                 },
                 callback: function (result) {
                     if (result) {
-                        parent.$http.delete(imagesUrl + image.Id).then(function (response) {
-                            toastr.success("Image removed successfuly.");
-                            parent.getImages();
+                        parent.$http.delete(nodesUrl + node.ID).then(function (response) {
+                            toastr.success("Node removed successfuly.");
+                            parent.getNodes();
                         }, function (error) {
                             toastr.warning("An error occured.");
                         });
@@ -55,6 +67,6 @@ var imagesVue = new Vue({
         }
     },
     created: function () {
-        this.getImages();
+        this.getNodes();
     }
 });
