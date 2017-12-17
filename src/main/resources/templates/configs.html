@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, shrink-to-fit=no"/>
+    <title>Nodes</title>
+
+    <link rel="stylesheet" href="../css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="../css/glyphicons.css"/>
+    <link rel="stylesheet" href="../css/tether.min.css"/>
+    <link rel="stylesheet" href="../css/main.css"/>
+    <link rel="stylesheet" href="../css/toastr.min.css"/>
+    <script src="../js/jquery-3.2.1.js"></script>
+    <script src="../js/tether.min.js"></script>
+    <script src="../js/popper.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/vue/vue.js"></script>
+    <script src="../js/vue/vue-resource-1.3.4.js"></script>
+    <script src="../js/toastr.min.js"></script>
+    <script src="../js/bootbox.min.js"></script>
+
+    <style>
+        html {
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="fragments/header :: nav"></div>
+
+<div class="container" id="docker-moon-configs">
+
+    <!-- container actions -->
+    <div class="row" style="padding-top: 10px;">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-sm-5">
+                        <div class="input-group">
+                            <span class="input-group-addon glyphicon glyphicon-search"></span>
+                            <input value="text" class="form-control" placeholder="Search Config" v-model="search"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                    <table class="table table-hover table-striped table-bordered table-responsive table-sm">
+                    <thead>
+                        <tr>
+                            <td>
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input class="container form-check-input" type="checkbox" v-model="isSelectedAllConfigs"/>
+                                    </label>
+                                </div>
+                            </td>
+                            <td>Id</td>
+                            <td>Created At</td>
+                            <td>Updated At</td>
+                            <td>Name</td>
+                            <td>Data</td>
+                            <td>Version</td>
+                            <td>Label</td>
+                            <td>Action</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="config in filteredConfigs">
+                            <td>
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input class="container form-check-input" type="checkbox" v-bind:value="config.ID" v-model="selectedConfigs"/>
+                                    </label>
+                                </div>
+                            </td>
+                            <td>{{ config.ID }}</td>
+                            <td>{{ new Date(config.CreatedAt).toLocaleString() }}</td>
+                            <td>{{ new Date(config.UpdatedAt).toLocaleString() }}</td>
+                            <td>{{ config.Spec.Name }}</td>
+                            <td>{{ config.Spec.Data }}</td>
+                            <td>{{ config.Version.Index }}</td>
+                            <td>
+                                <ul v-for="(value, key) in config.Spec.Labels" class="text-left">
+                                    <li>{{ key }} / {{ value }}</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" v-on:click="deleteConfig(config)">
+                                    <i class="glyphicon glyphicon-ban-circle" aria-hidden="true"></i> Remove
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../js/app/config.js"></script>
+</body>
+</html>
