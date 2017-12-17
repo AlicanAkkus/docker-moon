@@ -12,6 +12,7 @@ public class ExceptionHandler {
         try {
             return callable.call();
         } catch (Exception e) {
+            e.printStackTrace();
             throw new DockermoonException(e);
         }
     }

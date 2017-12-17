@@ -36,4 +36,18 @@ public class NodeController {
         Response response = nodeManager.deleteNode(nodeId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @ResponseBody
+    @PutMapping("/{nodeId}/status")
+    public ResponseEntity<Response> updateStatusNode(@PathVariable String nodeId, @RequestParam("q") String status) {
+        Response response = nodeManager.updateStatusNode(nodeId, status);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @ResponseBody
+    @PutMapping("/{nodeId}/role")
+    public ResponseEntity<Response> updateRoleNode(@PathVariable String nodeId, @RequestParam("q") String role) {
+        Response response = nodeManager.updateRoleNode(nodeId, role);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }

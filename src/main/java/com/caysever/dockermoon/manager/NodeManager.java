@@ -18,7 +18,15 @@ public class NodeManager {
         return nodeService.listOfAllNodes();
     }
 
-    public Response deleteNode(String nodeId){
+    public Response deleteNode(String nodeId) {
         return nodeService.deleteNode(nodeId);
+    }
+
+    public Response updateStatusNode(String nodeId, String status) {
+        return nodeService.updateStatusNode(nodeId, status);
+    }
+
+    public Response updateRoleNode(String nodeId, String role) {
+        return nodeService.updateRoleNode(nodeId, role);
     }
 }

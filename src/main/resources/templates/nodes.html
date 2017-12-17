@@ -58,9 +58,12 @@
                             <td>Id</td>
                             <td>Created At</td>
                             <td>Updated At</td>
+                            <td>Name</td>
                             <td>Role</td>
+                            <td>Leader</td>
                             <td>Availability</td>
-                            <td>Manager Status</td>
+                            <td>State</td>
+                            <td>Addr</td>
                             <td>Action</td>
                         </tr>
                     </thead>
@@ -73,18 +76,15 @@
                                     </label>
                                 </div>
                             </td>
-                            <td>{{ node.ID }}</td>
+                            <td>{{ node.ID.substr(0,8) }}</td>
                             <td>{{ new Date(node.CreatedAt).toLocaleString() }}</td>
                             <td>{{ new Date(node.UpdatedAt).toLocaleString() }}</td>
+                            <td>{{ node.Spec.Name }}</td>
                             <td><span class="badge badge-success">{{ node.Spec.Role }}</span></td>
+                            <td><span class="badge badge-success">{{ node.ManagerStatus.Leader }}</span></td>
                             <td><span class="badge" v-bind:class="node.Spec.Availability == 'active' ? 'badge-success' : 'badge-warning' ">{{ node.Spec.Availability }}</span></td>
-                            <td>
-                                <ul class="text-left">
-                                    <li><b>Addr :</b> {{ node.ManagerStatus.Addr }}</li>
-                                    <li><b>Leader :</b> {{ node.ManagerStatus.Leader }}</li>
-                                    <li><b>Reachability :</b> {{ node.ManagerStatus.Reachability }}</li>
-                                </ul>
-                            </td>
+                            <td><span class="badge" v-bind:class="node.Status.State == 'ready' ? 'badge-success' : 'badge-warning' ">{{ node.Status.State }}</span></td>
+                            <td>{{ node.Status.Addr }}</td>
                             <td>
                                 <button v-if="node.Spec.Role != 'manager'" class="btn btn-danger btn-sm" v-on:click="deleteNode(node)">
                                     <i class="glyphicon glyphicon-ban-circle" aria-hidden="true"></i> Remove
@@ -93,6 +93,18 @@
                                         v-on:click="deleteNode(node)" th:disabled="disabled"
                                         data-toggle="tooltip" data-placement="top" title="Cannot Remove Manager Node">
                                     <i class="glyphicon glyphicon-ban-circle" aria-hidden="true"></i> Remove
+                                </button>
+                                <button v-if="node.Spec.Availability != 'active'" class="btn btn-success btn-sm" v-on:click="updateNodeStatus(node, 'active')">
+                                    <i class="glyphicon glyphicon-triangle-left" aria-hidden="true"></i> To Active
+                                </button>
+                                <button v-if="node.Spec.Availability == 'active'" class="btn btn-dark btn-sm" v-on:click="updateNodeStatus(node, 'drain')">
+                                    <i class="glyphicon glyphicon-triangle-right" aria-hidden="true"></i> To Drain
+                                </button>
+                                <button v-if="node.Spec.Role != 'manager'" class="btn btn-success btn-sm" v-on:click="updateNodeRole(node, 'manager')">
+                                    <i class="glyphicon glyphicon-arrow-up" aria-hidden="true"></i> Promote
+                                </button>
+                                <button v-if="node.Spec.Role == 'manager'" class="btn btn-info btn-sm" v-on:click="updateNodeRole(node, 'worker')">
+                                    <i class="glyphicon glyphicon-arrow-down" aria-hidden="true"></i> Demote
                                 </button>
                             </td>
                         </tr>

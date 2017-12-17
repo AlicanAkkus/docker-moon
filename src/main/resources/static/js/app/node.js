@@ -56,8 +56,72 @@ var nodesVue = new Vue({
                 callback: function (result) {
                     if (result) {
                         parent.$http.delete(nodesUrl + node.ID).then(function (response) {
-                            toastr.success("Node removed successfuly.");
-                            parent.getNodes();
+                            if(response.data.status === 'success'){
+                                toastr.success("Node removed successfuly.");
+                                parent.getNodes();
+                            }else{
+                                toastr.warning(response.data.errorMessage);
+                            }
+                        }, function (error) {
+                            toastr.warning("An error occured.");
+                        });
+                    }
+                }
+            });
+        },
+        updateNodeStatus: function (node, status) {
+            var parent = this;
+            bootbox.confirm({
+                message: "Node Availability will be  set as " + status + ". Are you sure?",
+                buttons: {
+                    confirm: {
+                        label: 'Yes, I\'m sure!',
+                        className: 'btn-success'
+                    },
+                    cancel: {
+                        label: 'Not yet :(',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        parent.$http.put(nodesUrl + node.ID + "/status?q=" + status).then(function (response) {
+                            if(response.data.status === 'success'){
+                                toastr.success("Node Availability updated successfuly.");
+                                parent.getNodes();
+                            }else{
+                                toastr.warning(response.data.errorMessage);
+                            }
+                        }, function (error) {
+                            toastr.warning("An error occured.");
+                        });
+                    }
+                }
+            });
+        },
+        updateNodeRole: function (node, role) {
+            var parent = this;
+            bootbox.confirm({
+                message: "Node Role will be  set as " + role + ". Are you sure?",
+                buttons: {
+                    confirm: {
+                        label: 'Yes, I\'m sure!',
+                        className: 'btn-success'
+                    },
+                    cancel: {
+                        label: 'Not yet :(',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        parent.$http.put(nodesUrl + node.ID + "/role?q=" + role).then(function (response) {
+                            if(response.data.status === 'success'){
+                                toastr.success("Node Role updated successfuly.");
+                                parent.getNodes();
+                            }else{
+                                toastr.warning(response.data.errorMessage);
+                            }
                         }, function (error) {
                             toastr.warning("An error occured.");
                         });
