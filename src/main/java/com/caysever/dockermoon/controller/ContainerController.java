@@ -143,4 +143,11 @@ public class ContainerController {
         Response response = containerManager.removeContainer(containerId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @ResponseBody
+    @PutMapping("/rename/{containerId}")
+    public ResponseEntity<Response> renameContainer(@PathVariable String containerId, @RequestParam("name") String name) {
+        Response response = containerManager.renameContainer(containerId, name);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }

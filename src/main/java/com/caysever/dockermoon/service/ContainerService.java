@@ -239,4 +239,17 @@ public class ContainerService {
 
         return response;
     }
+
+    public Response renameContainer(String containerId, String newName) {
+        Response response = new Response();
+
+        handle(() -> {
+            dockerClient.renameContainer(containerId, newName);
+
+            response.setStatus(ResponseStatusType.SUCCESS.getValue());
+            return response;
+        });
+
+        return response;
+    }
 }

@@ -173,6 +173,37 @@ var containersVue = new Vue({
                 }
             });
         },
+        renameContainer: function (container) {
+            var parent = this;
+            var newContainerName = $("#" + container.Id).val();
+            if(newContainerName === ''){
+                toastr.warning("Container Name could not be empty!");
+                return;
+            }
+            bootbox.confirm({
+                message: "Container name will be updated. Are you sure?",
+                buttons: {
+                    confirm: {
+                        label: 'Yes, I\'m sure!',
+                        className: 'btn-success'
+                    },
+                    cancel: {
+                        label: 'Not yet :(',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        parent.$http.put(containersUrl + 'rename/' + container.Id + "?name=" + newContainerName).then(function (response) {
+                            toastr.success("Container updated.");
+                            parent.getImages();
+                        }, function (error) {
+                            toastr.warning("An error occured.");
+                        });
+                    }
+                }
+            });
+        },
         logContainer: function (container) {
             this.$http.get(containersUrl + 'log/' + container.Id).then(function (response) {
                 this.containerLogs.command = "docker container logs " + container.Id.substr(0,8);

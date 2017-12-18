@@ -83,4 +83,8 @@ public class ContainerManager {
     public Response removeContainers(ArrayList<String> containers) {
         return containerService.removeContainers(containers);
     }
+
+    public Response renameContainer(String containerId, String newName) {
+        return containerService.renameContainer(containerId, newName);
+    }
 }

@@ -85,7 +85,6 @@
                             <td>Command</td>
                             <td>Image</td>
                             <td>Ports</td>
-                            <td>Created</td>
                             <td>State</td>
                             <td>Actions</td>
                         </tr>
@@ -100,11 +99,19 @@
                                 </div>
                             </td>
                             <td>{{ container.Id.substr(0,8) }}</td>
-                            <td>{{ container.Names }}</td>
+                            <td>
+                                <div class="input-group">
+                                      <span class="input-group-btn">
+                                        <button class="btn btn-warning btn-sm" type="button" v-on:click="renameContainer(container)">
+                                            <i class="glyphicon glyphicon-ok" aria-hidden="true"></i>
+                                        </button>
+                                      </span>
+                                    <input type="text" class="form-control" v-bind:value="container.Names.toString()"/>
+                                </div>
+                            </td>
                             <td>{{ container.Command }}</td>
                             <td>{{ container.Image }}</td>
                             <td>{{ container.Ports }}</td>
-                            <td>{{ new Date(container.Created).toLocaleString()}}</td>
                             <td>
                                 <span class="badge" v-bind:class="getContainerState(container.State)">{{ container.State }}</span>
                             </td>
